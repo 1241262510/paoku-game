@@ -2,7 +2,9 @@
 
 基于 Three.js 的神庙逃亡式 3D 跑酷网页游戏，零外部素材（程序化几何 + Web Audio 合成音效），纯静态文件无需构建。
 
-🎮 **在线游玩**：https://conglin-kupao.netlify.app
+🎮 **在线游玩**：
+- https://1241262510.github.io/paoku-game/ （GitHub Pages）
+- https://conglin-kupao.netlify.app （Netlify）
 
 ## 玩法
 
