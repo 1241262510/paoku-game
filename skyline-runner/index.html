@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#11191e" />
+    <title>云际快线</title>
+  </head>
+  <body>
+    <main id="app">
+      <div id="hud" class="hud is-hidden" aria-live="polite">
+        <div class="stat"><span>距离</span><strong id="distance">0000m</strong></div>
+        <div class="stat stat--center"><span>晶体 / 连击</span><strong><span id="coins">0</span> <i id="combo">x1</i></strong></div>
+        <div class="stat stat--right"><span>速度</span><strong id="speed">0</strong></div>
+      </div>
+      <div id="powerups" class="powerups"></div>
+      <button id="sound-toggle" class="sound-toggle" type="button" aria-label="切换声音">声音 开</button>
+      <button id="haptic-toggle" class="haptic-toggle" type="button" aria-label="切换触感">触感 开</button>
+      <div class="touch-controls" aria-label="触屏操作">
+        <button type="button" data-control="left" aria-label="向左换道">左</button>
+        <button type="button" data-control="jump" aria-label="跳跃">跳</button>
+        <button type="button" data-control="slide" aria-label="滑铲">滑</button>
+        <button type="button" data-control="right" aria-label="向右换道">右</button>
+      </div>
+
+      <section id="start-screen" class="screen screen--start">
+        <div class="intro-rule"></div>
+        <p class="eyebrow">ALTITUDE / 2086</p>
+        <h1>云际快线</h1>
+        <p class="intro-copy">穿过暮色中的悬浮货运城，保持在轨。</p>
+        <div class="controls" aria-label="操作说明">
+          <span><b>A</b><b>D</b> 换道</span><span><b>空格</b> 跳跃</span><span><b>S</b> 俯冲</span>
+        </div>
+        <div class="profile" aria-label="驾驶员档案">
+          <div><span>最远记录</span><strong id="profile-best">0000m</strong></div>
+          <div><span>累计晶体</span><strong id="profile-crystals">000</strong></div>
+          <div><span>今日航线</span><strong id="daily-status">0 / 0m</strong></div>
+        </div>
+        <div id="skin-select" class="skin-select" aria-label="角色配色"></div>
+        <button id="start-button" class="action" type="button">进入轨道</button>
+        <p class="touch-hint">手机：向四个方向滑动</p>
+      </section>
+
+      <section id="pause-screen" class="screen is-hidden">
+        <p class="eyebrow">SYSTEM HOLD</p><h2>轨道已暂停</h2>
+        <button id="resume-button" class="action" type="button">继续前进</button>
+        <p class="shortcut">按 P 或 Esc 也可继续</p>
+      </section>
+
+      <section id="gameover-screen" class="screen is-hidden">
+        <p class="eyebrow">RUN COMPLETE</p><h2>离开了轨道</h2>
+        <div class="results"><div><span>本次距离</span><strong id="final-distance">0m</strong></div><div><span>收集晶体</span><strong id="final-coins">0</strong></div></div>
+        <p id="best-score" class="shortcut">最远记录 0m</p>
+        <p id="daily-result" class="shortcut"></p>
+        <div id="history" class="history" aria-label="近期飞行记录"></div>
+        <button id="restart-button" class="action" type="button">重新接入</button>
+      </section>
+      <div id="toast" class="toast" aria-live="polite"></div>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
