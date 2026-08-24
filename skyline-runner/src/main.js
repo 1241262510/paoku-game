@@ -8,6 +8,9 @@ const dailyTarget = 520 + [...dailyKey].reduce((total, letter) => total + letter
 const progress = { best: Number(localStorage.getItem('skyline-best') || 0), totalCrystals: Number(localStorage.getItem('skyline-crystals') || 0), skin: Number(localStorage.getItem('skyline-skin') || 0), history: JSON.parse(localStorage.getItem('skyline-history') || '[]'), dailyDone: localStorage.getItem('skyline-daily') === dailyKey };
 const skins = [{ name: '晚霞快递', body: '#d26542', pack: '#27484a', unlock: 0 }, { name: '苔原信使', body: '#5d9b88', pack: '#27484a', unlock: 45 }, { name: '沙金航员', body: '#cf9c4d', pack: '#4a4031', unlock: 120 }];
 const state = { mode: 'READY', lane: 1, y: 0, vy: 0, sliding: 0, speed: 14, distance: 0, coins: 0, combo: 0, multiplier: 1, comboTimer: 0, shield: false, magnet: 0, boost: 0, shake: 0, spawn: 0, wasAirborne: false, landPulse: 0, chapter: 0, best: progress.best };
+const touchDevice = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+let renderPixelRatio = touchDevice ? Math.min(devicePixelRatio, 1.15) : Math.min(devicePixelRatio, 1.75);
+const frameQuality = { elapsed: 0, frames: 0, stableWindows: 0 };
 const audio = { context: null, muted: localStorage.getItem('skyline-muted') === 'true' };
 const haptics = { enabled: localStorage.getItem('skyline-haptics') !== 'false' };
 function haptic(pattern) { if (haptics.enabled && navigator.vibrate) navigator.vibrate(pattern); }
@@ -16,10 +19,10 @@ function tone(frequency, duration, type = 'sine', volume = .035, glide = 0) { if
 function sfx(name) { const sounds = { lane: () => tone(180,.055,'triangle',.018,45), jump: () => tone(260,.17,'sine',.045,190), slide: () => tone(120,.11,'sawtooth',.022,-40), coin: () => { tone(720,.07,'sine',.035,220); setTimeout(() => tone(980,.08,'sine',.028,150), 48); }, power: () => { tone(330,.14,'triangle',.05,220); setTimeout(() => tone(620,.2,'sine',.03,280), 70); }, near: () => tone(450,.11,'sine',.032,110), hit: () => { tone(110,.3,'sawtooth',.07,-65); tone(70,.34,'square',.035,-20); }, land: () => tone(95,.06,'triangle',.018,-25) }; sounds[name]?.(); }
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+renderer.setPixelRatio(renderPixelRatio);
 renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = !touchDevice;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 document.querySelector('#app').prepend(renderer.domElement);
 
@@ -193,7 +196,25 @@ let touch = null; addEventListener('touchstart', e => { touch = e.changedTouches
 document.querySelectorAll('[data-control]').forEach(button => button.addEventListener('pointerdown', (event) => { event.preventDefault(); const control = button.dataset.control; if (control === 'left') move(-1); else if (control === 'right') move(1); else action(control); }));
 $('start-button').onclick = reset; $('restart-button').onclick = reset; $('resume-button').onclick = () => { state.mode='RUNNING'; $('pause-screen').classList.add('is-hidden'); };
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.mode==='RUNNING'){state.mode='PAUSED';$('pause-screen').classList.remove('is-hidden')}});
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));});
+function resizeRenderer() {
+  const viewport = window.visualViewport || window;
+  const width = Math.round(viewport.width || innerWidth); const height = Math.round(viewport.height || innerHeight);
+  camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setSize(width, height, false);
+}
+function tuneMobileQuality(dt) {
+  if (!touchDevice) return;
+  frameQuality.elapsed += dt; frameQuality.frames++;
+  if (frameQuality.elapsed < 2) return;
+  const averageFrame = frameQuality.elapsed / frameQuality.frames;
+  if (averageFrame > 1 / 42 && renderPixelRatio > .85) {
+    renderPixelRatio = Math.max(.85, renderPixelRatio - .15); renderer.setPixelRatio(renderPixelRatio); resizeRenderer(); frameQuality.stableWindows = 0; showToast('已调整为流畅画质');
+  } else if (averageFrame < 1 / 56 && renderPixelRatio < 1.15) {
+    frameQuality.stableWindows++;
+    if (frameQuality.stableWindows >= 3) { renderPixelRatio = Math.min(1.15, renderPixelRatio + .1); renderer.setPixelRatio(renderPixelRatio); resizeRenderer(); frameQuality.stableWindows = 0; }
+  } else frameQuality.stableWindows = 0;
+  frameQuality.elapsed = 0; frameQuality.frames = 0;
+}
+addEventListener('resize', resizeRenderer); window.visualViewport?.addEventListener('resize', resizeRenderer);
 let lastFrame = performance.now();
-function frame(time) { requestAnimationFrame(frame); const dt = Math.min(.05, (time - lastFrame) / 1000); lastFrame = time; update(dt, time); renderer.render(scene,camera); }
-requestAnimationFrame(frame);
+function frame(time) { const dt = Math.min(.05, (time - lastFrame) / 1000); lastFrame = time; tuneMobileQuality(dt); update(dt, time); renderer.render(scene,camera); }
+renderer.setAnimationLoop(frame);

@@ -50,3 +50,9 @@ skyline-runner/   # 另一个 Vite 实验项目
 ```bash
 npx netlify-cli deploy --dir . --prod --site-name conglin-kupao
 ```
+
+## 版权与致谢
+
+- 本项目由 **GLM-5.3**（智谱 Z.ai 大模型）辅助开发完成
+- 游戏引擎：[Three.js](https://threejs.org/)（MIT License，r160）
+- 音效为 Web Audio 实时合成，无外部素材
