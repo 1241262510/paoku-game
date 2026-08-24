@@ -2,9 +2,7 @@
 
 基于 Three.js 的神庙逃亡式 3D 跑酷网页游戏，零外部素材（程序化几何 + Web Audio 合成音效），纯静态文件无需构建。
 
-🎮 **在线游玩**：
-- https://1241262510.github.io/paoku-game/ （GitHub Pages）
-- https://conglin-kupao.netlify.app （Netlify）
+🎮 **在线游玩**：https://1241262510.github.io/paoku-game/
 
 ## 玩法
 
@@ -47,8 +45,10 @@ skyline-runner/   # 另一个 Vite 实验项目
 
 ## 部署
 
+仅使用 GitHub Pages：推送到 `main` 即自动部署（`.github/workflows/pages.yml`）。
+
 ```bash
-npx netlify-cli deploy --dir . --prod --site-name conglin-kupao
+git push origin main
 ```
 
 ## 版权与致谢
